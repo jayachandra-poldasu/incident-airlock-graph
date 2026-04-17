@@ -1,0 +1,26 @@
+[
+    {
+        "id": "INC-882",
+        "pattern": "ConnectionTimeout",
+        "service": "Payment-Gateway",
+        "team": "FinTech-Core",
+        "root_cause": "Expired SSL certificate on the load balancer.",
+        "remediation": "Renew cert via Let's Encrypt and reload Nginx."
+    },
+    {
+        "id": "INC-941",
+        "pattern": "OutOfMemory",
+        "service": "Auth-Service",
+        "team": "Identity-Team",
+        "root_cause": "Memory leak in the user session cache.",
+        "remediation": "Flush the Redis instance and scale the pod to 3 replicas."
+    },
+    {
+        "id": "INC-412",
+        "pattern": "DeadlockFound",
+        "service": "Orders-DB",
+        "team": "Data-Platform",
+        "root_cause": "Race condition on the 'inventory_counts' table during peak load.",
+        "remediation": "Apply the optimized index 'idx_inventory_lock' and restart the worker."
+    }
+]
