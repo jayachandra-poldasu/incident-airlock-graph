@@ -11,7 +11,7 @@ dev: ## Install all dependencies (production + dev/test)
 	pip install -r requirements-dev.txt
 
 test: ## Run test suite with coverage
-	AIRLOCK_AI_BACKEND=none pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
+	PYTHONPATH=. AIRLOCK_AI_BACKEND=none pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
 
 lint: ## Run linter
 	ruff check app/ tests/
