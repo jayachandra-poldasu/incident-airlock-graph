@@ -1,0 +1,137 @@
+[
+  {
+    "id": "rb-pay-01",
+    "title": "Resolve Payment Gateway Timeouts",
+    "service_ids": ["payment-service", "database-primary"],
+    "categories": ["latency", "error_rate"],
+    "steps": [
+      "1. Check Datadog dashboard for payment-service latency and 5xx errors.",
+      "2. Verify database-primary for long-running queries locking payment tables.",
+      "3. If DB locks are present, identify the query and determine if it was introduced in a recent deployment.",
+      "4. Roll back the payment-service deployment if a bad query was introduced.",
+      "5. If it's a third-party gateway issue, verify circuit breaker status."
+    ],
+    "last_updated": "2023-12-01T10:00:00Z",
+    "success_rate": 0.85,
+    "estimated_time_minutes": 15,
+    "tags": ["payment", "timeout", "database", "rollback"]
+  },
+  {
+    "id": "rb-pay-02",
+    "title": "Failover Payment Processor",
+    "service_ids": ["payment-service"],
+    "categories": ["latency", "outage"],
+    "steps": [
+      "1. Confirm primary payment gateway is degraded via external status page.",
+      "2. Open feature flag UI or use CLI to toggle `use_fallback_processor` to true.",
+      "3. Monitor success rate on the fallback processor.",
+      "4. Communicate to CS team that some payment methods may be temporarily unavailable."
+    ],
+    "last_updated": "2024-01-15T09:30:00Z",
+    "success_rate": 0.95,
+    "estimated_time_minutes": 5,
+    "tags": ["payment", "failover", "circuit-breaker"]
+  },
+  {
+    "id": "rb-ord-01",
+    "title": "Recover from Inventory Sync Failures",
+    "service_ids": ["order-service", "inventory-service", "database-primary"],
+    "categories": ["error_rate", "capacity"],
+    "steps": [
+      "1. Check if inventory-service cache hit rate has dropped significantly.",
+      "2. If cache eviction occurred, database-primary connections may be exhausted.",
+      "3. Temporarily scale up database-primary connection limits via Terraform.",
+      "4. Manually trigger cache pre-warming script: `./scripts/warm_inventory_cache.sh`.",
+      "5. Once cache hit rate recovers > 90%, revert connection limits."
+    ],
+    "last_updated": "2023-07-10T14:00:00Z",
+    "success_rate": 0.75,
+    "estimated_time_minutes": 30,
+    "tags": ["order", "inventory", "cache", "database"]
+  },
+  {
+    "id": "rb-ord-02",
+    "title": "Clear Order Message Queue Backlog",
+    "service_ids": ["order-service"],
+    "categories": ["capacity", "latency"],
+    "steps": [
+      "1. Identify the Kafka consumer lag for the `orders_processing` topic.",
+      "2. Check order-service pod resource utilization (CPU/Memory).",
+      "3. If underutilized, verify `CONSUMER_THREAD_POOL_SIZE` config.",
+      "4. Increase thread pool size or scale out order-service pods horizontally.",
+      "5. Monitor consumer lag until it reaches an acceptable threshold (< 1000)."
+    ],
+    "last_updated": "2024-06-05T11:00:00Z",
+    "success_rate": 0.90,
+    "estimated_time_minutes": 10,
+    "tags": ["order", "kafka", "queue", "scaling"]
+  },
+  {
+    "id": "rb-auth-01",
+    "title": "Mitigate Auth Service OOM Kills",
+    "service_ids": ["auth-service"],
+    "categories": ["capacity", "outage"],
+    "steps": [
+      "1. Confirm auth-service pods are restarting with Exit Code 137 (OOMKilled).",
+      "2. Check recent deployments for dependency updates or memory leaks.",
+      "3. If suspected deployment issue, rollback immediately: `kubectl rollout undo deploy/auth-service`.",
+      "4. Capture a heap dump from a surviving pod for analysis.",
+      "5. Consider temporarily increasing memory limits if rollback is not an option."
+    ],
+    "last_updated": "2024-03-10T08:00:00Z",
+    "success_rate": 0.88,
+    "estimated_time_minutes": 15,
+    "tags": ["auth", "oom", "memory", "kubernetes"]
+  },
+  {
+    "id": "rb-auth-02",
+    "title": "Rotate Cache Cluster SSL Certificates",
+    "service_ids": ["auth-service", "cache-cluster"],
+    "categories": ["security", "latency"],
+    "steps": [
+      "1. Verify certificate expiration date on cache-cluster nodes.",
+      "2. Trigger cert rotation job in CI/CD pipeline.",
+      "3. Perform rolling restart of cache-cluster nodes to load new certs.",
+      "4. Perform rolling restart of dependent services (auth-service) to establish new connections.",
+      "5. Verify latency returns to baseline."
+    ],
+    "last_updated": "2023-08-10T16:00:00Z",
+    "success_rate": 0.92,
+    "estimated_time_minutes": 25,
+    "tags": ["auth", "redis", "ssl", "certificate"]
+  },
+  {
+    "id": "rb-db-01",
+    "title": "Kill Rogue Database Queries",
+    "service_ids": ["database-primary"],
+    "categories": ["capacity", "latency"],
+    "steps": [
+      "1. Access primary DB console: `psql -h database-primary`.",
+      "2. Query `pg_stat_activity` to find long-running active queries.",
+      "3. Identify the source service and query.",
+      "4. Terminate the query: `SELECT pg_terminate_backend(pid);`.",
+      "5. Update the offending service to use read replicas if it's an analytics query."
+    ],
+    "last_updated": "2023-11-01T13:00:00Z",
+    "success_rate": 0.98,
+    "estimated_time_minutes": 5,
+    "tags": ["database", "cpu", "postgres", "kill-query"]
+  },
+  {
+    "id": "rb-api-01",
+    "title": "API Gateway Certificate Rotation",
+    "service_ids": ["api-gateway"],
+    "categories": ["security", "outage"],
+    "steps": [
+      "1. Check Let's Encrypt / Vault for certificate status.",
+      "2. Verify DNS provider API keys are valid.",
+      "3. Run automated cert renewal script.",
+      "4. Reload API Gateway config: `kong reload`.",
+      "5. Run external health checks to verify SSL handshake success."
+    ],
+    "last_updated": "2024-01-10T10:00:00Z",
+    "success_rate": 0.85,
+    "estimated_time_minutes": 10,
+    "tags": ["api-gateway", "ssl", "kong"]
+  }
+]

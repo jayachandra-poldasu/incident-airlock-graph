@@ -1,0 +1,110 @@
+[
+  {
+    "id": "payment-service",
+    "name": "Payment Service",
+    "team": "Payments Team",
+    "owner": "Alice Chen",
+    "on_call": "Alice Chen",
+    "escalation_path": ["Alice Chen", "Bob Martinez", "VP Engineering"],
+    "dependencies": ["database-primary", "payment-gateway", "auth-service"],
+    "dependents": ["order-service", "billing-service"],
+    "tier": "tier-1",
+    "description": "Handles all payment processing, tokenization, and transaction management"
+  },
+  {
+    "id": "order-service",
+    "name": "Order Service",
+    "team": "Commerce Team",
+    "owner": "Bob Martinez",
+    "on_call": "Carol Wang",
+    "escalation_path": ["Carol Wang", "Bob Martinez", "VP Engineering"],
+    "dependencies": ["payment-service", "inventory-service", "database-primary"],
+    "dependents": ["notification-service"],
+    "tier": "tier-1",
+    "description": "Manages order lifecycle from creation to fulfillment"
+  },
+  {
+    "id": "auth-service",
+    "name": "Authentication Service",
+    "team": "Platform Team",
+    "owner": "Diana Patel",
+    "on_call": "Diana Patel",
+    "escalation_path": ["Diana Patel", "Erik Johansson", "VP Engineering"],
+    "dependencies": ["database-primary", "cache-cluster"],
+    "dependents": ["payment-service", "order-service", "api-gateway"],
+    "tier": "tier-1",
+    "description": "Handles user authentication, OAuth, token management, and session validation"
+  },
+  {
+    "id": "inventory-service",
+    "name": "Inventory Service",
+    "team": "Commerce Team",
+    "owner": "Bob Martinez",
+    "on_call": "Frank Liu",
+    "escalation_path": ["Frank Liu", "Bob Martinez", "VP Engineering"],
+    "dependencies": ["database-primary", "cache-cluster"],
+    "dependents": ["order-service"],
+    "tier": "tier-2",
+    "description": "Tracks product inventory levels, reservations, and warehouse sync"
+  },
+  {
+    "id": "notification-service",
+    "name": "Notification Service",
+    "team": "Platform Team",
+    "owner": "Erik Johansson",
+    "on_call": "Grace Kim",
+    "escalation_path": ["Grace Kim", "Erik Johansson", "VP Engineering"],
+    "dependencies": ["order-service", "auth-service"],
+    "dependents": [],
+    "tier": "tier-2",
+    "description": "Sends email, SMS, and push notifications for order and system events"
+  },
+  {
+    "id": "database-primary",
+    "name": "Primary Database Cluster",
+    "team": "Infrastructure Team",
+    "owner": "Hank Torres",
+    "on_call": "Hank Torres",
+    "escalation_path": ["Hank Torres", "Irene Novak", "VP Infrastructure"],
+    "dependencies": [],
+    "dependents": ["payment-service", "order-service", "auth-service", "inventory-service", "billing-service"],
+    "tier": "tier-1",
+    "description": "PostgreSQL primary cluster with read replicas for all transactional data"
+  },
+  {
+    "id": "cache-cluster",
+    "name": "Redis Cache Cluster",
+    "team": "Infrastructure Team",
+    "owner": "Irene Novak",
+    "on_call": "Irene Novak",
+    "escalation_path": ["Irene Novak", "Hank Torres", "VP Infrastructure"],
+    "dependencies": [],
+    "dependents": ["auth-service", "inventory-service", "api-gateway"],
+    "tier": "tier-2",
+    "description": "Redis cluster for session caching, rate limiting, and hot data"
+  },
+  {
+    "id": "api-gateway",
+    "name": "API Gateway",
+    "team": "Platform Team",
+    "owner": "Erik Johansson",
+    "on_call": "Diana Patel",
+    "escalation_path": ["Diana Patel", "Erik Johansson", "VP Engineering"],
+    "dependencies": ["auth-service", "cache-cluster"],
+    "dependents": [],
+    "tier": "tier-1",
+    "description": "Kong-based API gateway handling routing, rate limiting, and SSL termination"
+  },
+  {
+    "id": "billing-service",
+    "name": "Billing Service",
+    "team": "Payments Team",
+    "owner": "Alice Chen",
+    "on_call": "Jake Moreno",
+    "escalation_path": ["Jake Moreno", "Alice Chen", "VP Engineering"],
+    "dependencies": ["payment-service", "database-primary"],
+    "dependents": [],
+    "tier": "tier-2",
+    "description": "Generates invoices, manages subscriptions, and processes recurring charges"
+  }
+]

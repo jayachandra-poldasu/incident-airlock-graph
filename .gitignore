@@ -1,4 +1,37 @@
-venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 .DS_Store
+
+# Test & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Linting
+.ruff_cache/
+
+# Environment
+.env
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+# Docker
+.dockerignore
